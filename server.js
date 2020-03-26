@@ -24,6 +24,16 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('editingText', data);
   });
 
+  //CODE SOCKETS
+  socket.on('newCode', (data) => {
+    console.log('server: receiving and sending ' + data);
+    socket.broadcast.emit('newCode', data);
+  });
+  socket.on('deleteCode', (data) => {
+    //console.log('server: receiving and sending ' + data);
+    socket.broadcast.emit('deleteCode', data);
+  });
+
   // CHAT SOCKETS
   socket.on('join', ({ name, room }, callback) => {
     const { error, user } = addUser({ id: socket.id, name, room });
