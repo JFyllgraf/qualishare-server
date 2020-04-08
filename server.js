@@ -1,11 +1,10 @@
 const express = require('express');
+const fileUpload = require('express-fileupload');
 const socketio = require('socket.io');
 const http = require('http');
 
 const { addUser, removeUser, getUser, getUsersInRoom } = require('./users.js');
-
 const PORT = process.env.PORT || 5000;
-
 const router = require('./router');
 
 const app = express();
@@ -13,7 +12,22 @@ const server = http.createServer(app);
 const io = socketio(server);
 
 app.use(router);
+app.use(fileUpload());
 
+app.post('/upload', (req, res) => {
+  console.log("In here");
+  if(req.files === null){
+    return res.status(400).json({msg:'no file uploaded'});
+  }
+  const file = req.files.file;
+  file.mv(`C:/Users/Ruben/Desktop/uploaded_files/${file.name}`, err => {
+    if (err){
+      console.error(err);
+      return res.status(500).send(err);
+    }
+    res.json({fileName: file.name, filePath: `/uploaded_files/${file.name}` })
+  })
+});
 
 
 io.on('connection', (socket) => {
