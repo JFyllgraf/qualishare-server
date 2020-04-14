@@ -35,7 +35,7 @@ db.once('open', function () {
         }
     })
 
-
+    //
     //print all kittens
     Kitten.find(function (err, kittens) {
         kittens.map(kitten => {
