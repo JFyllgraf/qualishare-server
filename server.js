@@ -3,7 +3,12 @@ const fileUpload = require('express-fileupload');
 const socketio = require('socket.io');
 const http = require('http');
 
+
 const { addUser, removeUser, getUser, getUsersInRoom } = require('./users.js');
+const {quote_schema, Quote} = require('./db_schemas/quote_schema');
+const {code_schema, Code} = require('./db_schemas/code_schema');
+const uri = "mongodb+srv://dbUser:HTJCOtJR25povwdT@clusterboi-omexg.azure.mongodb.net/test?retryWrites=true&w=majority";
+
 const PORT = process.env.PORT || 5000;
 const router = require('./router');
 
@@ -13,6 +18,11 @@ const io = socketio(server);
 
 app.use(router);
 app.use(fileUpload());
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 app.post('/upload', (req, res) => {
   console.log("In here");
@@ -23,12 +33,49 @@ app.post('/upload', (req, res) => {
   file.mv(`C:/Users/Ruben/Desktop/uploaded_files/${file.name}`, err => {
     if (err){
       console.error(err);
-      return res.status(500).send(err);
+      //return res.status(500).send(err);
     }
-    res.json({fileName: file.name, filePath: `/uploaded_files/${file.name}` })
+    //res.json({fileName: file.name, filePath: `/uploaded_files/${file.name}` })
   })
 });
 
+app.post('http://localhost:3000/newQuote', (req, res) => {
+  console.log("In new quote")
+  try {
+    mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
+      let quote = new Quote();
+      quote.quoteText = req.quoteText
+      quote.quoteOffSet = req.quoteOffSet
+      quote.codeRefs = req.codeRefs
+      quote.documentNum = req.documentNum
+      return quote
+    }).then(result => {
+      saveQuotePromise(result);
+    }).catch(err =>{
+      console.log(err)
+      mongoose.disconnect();
+    })
+  }
+  catch (err) {
+    console.log(err);
+  }
+
+})
+
+function saveQuotePromise(quote) {
+  quote.save().then((saveResult) => {
+    console.log(saveResult);
+    return Quote.find();
+  }).then((result) => {
+    console.log(result);
+    mongoose.disconnect();
+  }).catch(err => {
+    if (err) {
+      console.log(err);
+      mongoose.disconnect();
+    }
+  })
+}
 
 io.on('connection', (socket) => {
 
