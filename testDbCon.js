@@ -66,6 +66,5 @@ function saveQuotePromise(){
             console.log(err);
         }
     })
-}
 
 //these functions are now equivalent
