@@ -8,21 +8,27 @@ const { addUser, removeUser, getUser, getUsersInRoom } = require('./users.js');
 const {quote_schema, Quote} = require('./db_schemas/quote_schema');
 const {code_schema, Code} = require('./db_schemas/code_schema');
 const uri = "mongodb+srv://dbUser:HTJCOtJR25povwdT@clusterboi-omexg.azure.mongodb.net/test?retryWrites=true&w=majority";
+const mongoose = require('mongoose');
 
 const PORT = process.env.PORT || 5000;
 const router = require('./router');
 
+
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
+//const bodyParser = require('body-parser');
 
 app.use(router);
 app.use(fileUpload());
+app.use(express.json());
+//this is also important
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
+
 
 app.post('/upload', (req, res) => {
   console.log("In here");
@@ -39,20 +45,24 @@ app.post('/upload', (req, res) => {
   })
 });
 
-app.post('http://localhost:3000/newQuote', (req, res) => {
-  console.log("In new quote")
+app.post('/newQuote', (req, res) => {
   try {
     mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
       let quote = new Quote();
-      quote.quoteText = req.quoteText
-      quote.quoteOffSet = req.quoteOffSet
-      quote.codeRefs = req.codeRefs
-      quote.documentNum = req.documentNum
+      quote.quoteText = req.body.quoteText
+      quote.quoteOffSet = req.body.quoteOffset
+      quote.codeRefs = req.body.codeRefs
+      quote.documentNum = req.body.documentNum
+
       return quote
-    }).then(result => {
-      saveQuotePromise(result);
+    }).then(quote => {
+      quote.save().then(() => {
+        res.json("added quote");
+      }).catch( err => {
+        res.status(400).json("Error: "+err);
+        mongoose.disconnect();
+      })
     }).catch(err =>{
-      console.log(err)
       mongoose.disconnect();
     })
   }
