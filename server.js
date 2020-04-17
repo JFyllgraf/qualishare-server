@@ -30,17 +30,16 @@ app.use(function(req, res, next) {
 });
 
 app.post('/upload', (req, res) => {
-  console.log("In here");
   if(req.files === null){
     return res.status(400).json({msg:'no file uploaded'});
   }
   const file = req.files.file;
-  file.mv(`C:/Users/Ruben/Desktop/uploaded_files/${file.name}`, err => {
+  file.mv(`C:/Users/Ruben/Desktop/uploaded_files/${file.name}`, err => { //this is callback, previous way before promises
     if (err){
       console.error(err);
-      //return res.status(500).send(err);
+      return res.status(500).send(err);
     }
-    //res.json({fileName: file.name, filePath: `/uploaded_files/${file.name}` })
+    res.json({fileName: file.name, filePath: `/uploaded_files/${file.name}` })
   })
 });
 
