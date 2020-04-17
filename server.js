@@ -13,7 +13,6 @@ const mongoose = require('mongoose');
 const PORT = process.env.PORT || 5000;
 const router = require('./router');
 
-
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
@@ -23,12 +22,12 @@ app.use(router);
 app.use(fileUpload());
 app.use(express.json());
 //this is also important
+
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
-
 
 app.post('/upload', (req, res) => {
   console.log("In here");
@@ -45,7 +44,10 @@ app.post('/upload', (req, res) => {
   })
 });
 
+let socket;
+
 app.post('/newQuote', (req, res) => {
+  console.log("in here");
   try {
     mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
       let quote = new Quote();
@@ -53,13 +55,13 @@ app.post('/newQuote', (req, res) => {
       quote.quoteOffSet = req.body.quoteOffset
       quote.codeRefs = req.body.codeRefs
       quote.documentNum = req.body.documentNum
-
       return quote
     }).then(quote => {
-      quote.save().then(() => {
-        res.json("added quote");
+      quote.save().then((data) => {
+        res.status(200).json("Ok");
+        console.log(data);
       }).catch( err => {
-        res.status(400).json("Error: "+err);
+        res.status(400).json("Error: " + err);
         mongoose.disconnect();
       })
     }).catch(err =>{
@@ -69,7 +71,6 @@ app.post('/newQuote', (req, res) => {
   catch (err) {
     console.log(err);
   }
-
 })
 
 function saveQuotePromise(quote) {
@@ -98,11 +99,17 @@ io.on('connection', (socket) => {
   //CODE SOCKETS
   socket.on('newCode', (data) => {
     console.log('server: receiving and sending ' + data);
+
     socket.broadcast.emit('newCode', data);
   });
   socket.on('deleteCode', (data) => {
     //console.log('server: receiving and sending ' + data);
     socket.broadcast.emit('deleteCode', data);
+  });
+  //QUOTE SOCKET
+  socket.on("newQuote", data => {
+    console.log('server: receiving and sending ' + JSON.stringify(data));
+    socket.broadcast.emit('newQuote', data);
   });
 
   // CHAT SOCKETS
