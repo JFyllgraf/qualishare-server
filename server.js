@@ -3,7 +3,7 @@ const fileUpload = require('express-fileupload');
 const socketio = require('socket.io');
 const http = require('http');
 
-
+var randomColor = require('randomcolor');
 const { addUser, removeUser, getUser, getUsersInRoom } = require('./users.js');
 const {quote_schema, Quote} = require('./db_schemas/quote_schema');
 const {code_schema, Code} = require('./db_schemas/code_schema');
@@ -85,6 +85,54 @@ app.delete('/deleteQuote', (req, res) =>{
         res.status(503).json("Could not delete quote: ", err);
       }
     })
+    }).catch(err =>{
+      res.status(500).json(err);
+      mongoose.disconnect();
+    })
+  }
+  catch (err) {
+    console.log(err);
+  }
+})
+
+app.post('/newCode', (req, res) => {
+  console.log("in code");
+  try {
+    mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
+      let code = new Code();
+      code.codeName = req.body.codeName;
+      code.quoteRefs = req.body.quoteRefs;
+      code.color = randomColor();
+      return code
+    }).then(code => {
+      code.save().then((data) => {
+        res.status(200).json(data);
+        console.log("Data: ", data);
+      }).catch( err => {
+        res.status(400).json("Error: " + err);
+        mongoose.disconnect();
+      })
+    }).catch(err =>{
+      mongoose.disconnect();
+    })
+  }
+  catch (err) {
+    console.log(err);
+  }
+})
+
+app.delete('/deleteCode', (req, res) =>{
+  console.log("in delete code");
+  try {
+    mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
+      Code.deleteOne(req.body.id, (err) =>{
+        if (!err){
+          res.status(200).json("Ok");
+        }
+        else{
+          res.status(503).json("Could not delete code: ", err);
+        }
+      })
     }).catch(err =>{
       res.status(500).json(err);
       mongoose.disconnect();

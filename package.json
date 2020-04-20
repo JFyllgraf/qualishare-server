@@ -17,6 +17,7 @@
     "express-fileupload": "^1.1.7-alpha.2",
     "mongoose": "^5.9.7",
     "nodemon": "^2.0.2",
+    "randomcolor": "^0.5.4",
     "socket.io": "^2.3.0"
   }
 }
