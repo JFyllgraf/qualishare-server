@@ -26,6 +26,7 @@ app.use(express.json());
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header('Access-Control-Allow-Methods', 'OPTIONS, POST, DELETE');
   next();
 });
 
@@ -57,13 +58,35 @@ app.post('/newQuote', (req, res) => {
       return quote
     }).then(quote => {
       quote.save().then((data) => {
-        res.status(200).json("Ok");
-        console.log(data);
+        res.status(200).json(data);
+        console.log("Data: ", data);
       }).catch( err => {
         res.status(400).json("Error: " + err);
         mongoose.disconnect();
       })
     }).catch(err =>{
+      mongoose.disconnect();
+    })
+  }
+  catch (err) {
+    console.log(err);
+  }
+})
+
+app.delete('/deleteQuote', (req, res) =>{
+  console.log("in here");
+  try {
+    mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
+    Quote.deleteOne(req.body.id, (err) =>{
+      if (!err){
+        res.status(200).json("Ok");
+      }
+      else{
+        res.status(503).json("Could not delete quote: ", err);
+      }
+    })
+    }).catch(err =>{
+      res.status(500).json(err);
       mongoose.disconnect();
     })
   }
@@ -97,7 +120,7 @@ io.on('connection', (socket) => {
 
   //CODE SOCKETS
   socket.on('newCode', (data) => {
-    console.log('server: receiving and sending ' + data);
+    console.log('server: newCode' + data);
 
     socket.broadcast.emit('newCode', data);
   });
@@ -107,9 +130,13 @@ io.on('connection', (socket) => {
   });
   //QUOTE SOCKET
   socket.on("newQuote", data => {
-    console.log('server: receiving and sending ' + JSON.stringify(data));
+    console.log('server: new quote ' + data);
     socket.broadcast.emit('newQuote', data);
   });
+  socket.on("deleteQuote", data =>{
+    console.log("server: delete quote" + data)
+    socket.broadcast.emit("deleteCode", data);
+  })
 
   // CHAT SOCKETS
   socket.on('join', ({ name, room }, callback) => {
