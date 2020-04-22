@@ -164,8 +164,7 @@ app.get("/Codes", (req, res) => {
     mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
       Code.find().then(codes => {
         console.log("THE CODES: ", codes);
-        res.json(codes);
-        res.status(200).json("Ok");
+        res.status(200).json(codes);
         mongoose.disconnect()
       }).catch(err => {
         res.status(500).json(err);
@@ -179,10 +178,29 @@ app.get("/Codes", (req, res) => {
     console.log(err);
     mongoose.disconnect();
   }
-  console.log("Disconnected mongoose");
 });
 
-
+app.get("/Quotes", (req, res) => {
+  console.log("in get quote");
+  try {
+    mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
+      Quote.find().then(quotes => {
+        console.log("THE Quotes: ", quotes);
+        res.status(200).json(quotes);
+        mongoose.disconnect()
+      }).catch(err => {
+        res.status(500).json(err);
+        console.log("was error");
+        mongoose.disconnect();
+      });
+    }).catch(err=>{
+      console.log(err);
+    })
+  } catch (err) {
+    console.log(err);
+    mongoose.disconnect();
+  }
+});
 
 io.on('connection', (socket) => {
 
