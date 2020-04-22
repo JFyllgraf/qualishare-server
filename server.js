@@ -163,16 +163,23 @@ app.get("/Codes", (req, res) => {
   try {
     mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
       Code.find().then(codes => {
-        res.data = codes
+        console.log("THE CODES: ", codes);
+        res.json(codes);
         res.status(200).json("Ok");
+        mongoose.disconnect()
       }).catch(err => {
         res.status(500).json(err);
+        console.log("was error");
         mongoose.disconnect();
       });
+    }).catch(err=>{
+      console.log(err);
     })
   } catch (err) {
     console.log(err);
+    mongoose.disconnect();
   }
+  console.log("Disconnected mongoose");
 });
 
 
