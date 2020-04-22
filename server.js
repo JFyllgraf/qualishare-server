@@ -101,13 +101,12 @@ app.post('/newCode', (req, res) => {
     mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
       let code = new Code();
       code.codeName = req.body.codeName;
-      code.quoteRefs = req.body.quoteRefs;
       code.color = randomColor();
       return code
     }).then(code => {
-      code.save().then((data) => {
-        res.status(200).json(data);
-        console.log("Data: ", data);
+      code.save().then((code) => {
+        res.status(200).json(code);
+        console.log("Data: ", code);
       }).catch( err => {
         res.status(400).json("Error: " + err);
         mongoose.disconnect();
@@ -158,6 +157,26 @@ function saveQuotePromise(quote) {
   })
 }
 
+//***********************GET REQUESTS************************
+app.get("/Codes", (req, res) => {
+  console.log("in get code");
+  try {
+    mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
+      Code.find().then(codes => {
+        res.data = codes
+        res.status(200).json("Ok");
+      }).catch(err => {
+        res.status(500).json(err);
+        mongoose.disconnect();
+      });
+    })
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+
+
 io.on('connection', (socket) => {
 
   // CONTENT SOCKETS
@@ -168,21 +187,20 @@ io.on('connection', (socket) => {
 
   //CODE SOCKETS
   socket.on('newCode', (data) => {
-    console.log('server: newCode' + data);
-
+    console.log('server IO: newCode' + data);
     socket.broadcast.emit('newCode', data);
   });
   socket.on('deleteCode', (data) => {
-    //console.log('server: receiving and sending ' + data);
+    console.log('server IO: deleteCode' + data);
     socket.broadcast.emit('deleteCode', data);
   });
   //QUOTE SOCKET
   socket.on("newQuote", data => {
-    console.log('server: new quote ' + data);
+    console.log('server IO: new quote ' + data);
     socket.broadcast.emit('newQuote', data);
   });
   socket.on("deleteQuote", data =>{
-    console.log("server: delete quote" + data)
+    console.log("server IO: delete quote" + data)
     socket.broadcast.emit("deleteCode", data);
   })
 
@@ -220,8 +238,4 @@ io.on('connection', (socket) => {
   })
 });
 
-
-
-
-
-server.listen(PORT, () => console.log(`Server has started on port ${PORT}`));
+  server.listen(PORT, () => console.log(`Server has started on port ${PORT}`));
