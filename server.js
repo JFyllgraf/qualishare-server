@@ -2,6 +2,9 @@ const express = require('express');
 const fileUpload = require('express-fileupload');
 const socketio = require('socket.io');
 const http = require('http');
+const fs = require('fs');
+const pdf = require('pdf-parse');
+
 
 var randomColor = require('randomcolor');
 const { addUser, removeUser, getUser, getUsersInRoom } = require('./users.js');
@@ -29,7 +32,7 @@ app.use(function(req, res, next) {
   res.header('Access-Control-Allow-Methods', 'OPTIONS, POST, DELETE');
   next();
 });
-
+/*
 app.post('/upload', (req, res) => {
   if(req.files === null){
     return res.status(400).json({msg:'no file uploaded'});
@@ -42,6 +45,31 @@ app.post('/upload', (req, res) => {
     }
     res.json({fileName: file.name, filePath: `/uploaded_files/${file.name}` })
   })
+});
+ */
+
+app.post('/upload', (req, res) => {
+  if(req.files === null){
+    return res.status(400).json({msg:'no file uploaded'});
+  }
+  let dataBuffer = req.files.file;
+
+  pdf(dataBuffer).then(function(data) {
+    // number of pages
+    ///console.log(data.numpages);
+    // PDF text
+    //console.log(data.text);
+    let x = data.text;
+    let obj = {
+      data: x
+    }
+    //console.log(x);
+    res.status(200).json(x);
+    //console.log("dude");
+  }).catch(err=>{
+    console.log(err);
+    res.status(500).json(err);
+  });
 });
 
 let socket;
@@ -112,6 +140,7 @@ app.post('/newCode', (req, res) => {
         mongoose.disconnect();
       })
     }).catch(err =>{
+      console.log(err);
       mongoose.disconnect();
     })
   }
