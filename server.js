@@ -52,24 +52,26 @@ app.post('/upload', (req, res) => {
   if(req.files === null){
     return res.status(400).json({msg:'no file uploaded'});
   }
-  let dataBuffer = req.files.file;
-
-  pdf(dataBuffer).then(function(data) {
-    // number of pages
-    ///console.log(data.numpages);
-    // PDF text
-    //console.log(data.text);
-    let x = data.text;
-    let obj = {
-      data: x
-    }
-    //console.log(x);
-    res.status(200).json(x);
-    //console.log("dude");
-  }).catch(err=>{
-    console.log(err);
-    res.status(500).json(err);
-  });
+  let file = req.files.file
+  if(file.name.toLowerCase().includes("pdf")){
+    pdf(file).then(function(data) {
+      // number of pages
+      ///console.log(data.numpages);
+      // PDF text
+      //console.log(data.text);
+      let x = data.text;
+      //console.log(x);
+      res.status(200).json(x);
+      //console.log("dude");
+    }).catch(err=>{
+      console.log(err);
+      res.status(500).json(err);
+    });
+  }
+  else{
+    console.log("could not process");
+    res.status(400).json("Could not handle anything else than pdf file");
+  }
 });
 
 let socket;
