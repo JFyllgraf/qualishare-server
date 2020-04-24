@@ -2,11 +2,10 @@ const express = require('express');
 const fileUpload = require('express-fileupload');
 const socketio = require('socket.io');
 const http = require('http');
-const fs = require('fs');
 const pdf = require('pdf-parse');
+const process = require('process');
 
-
-var randomColor = require('randomcolor');
+const randomColor = require('randomcolor');
 const { addUser, removeUser, getUser, getUsersInRoom } = require('./users.js');
 const {quote_schema, Quote} = require('./db_schemas/quote_schema');
 const {code_schema, Code} = require('./db_schemas/code_schema');
@@ -19,35 +18,28 @@ const router = require('./router');
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
-//const bodyParser = require('body-parser');
 
 app.use(router);
 app.use(fileUpload());
 app.use(express.json());
-//this is also important
 
+//this is also important
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   res.header('Access-Control-Allow-Methods', 'OPTIONS, POST, DELETE');
   next();
 });
-/*
-app.post('/upload', (req, res) => {
-  if(req.files === null){
-    return res.status(400).json({msg:'no file uploaded'});
-  }
-  const file = req.files.file;
-  file.mv(`C:/Users/Ruben/Desktop/uploaded_files/${file.name}`, err => { //this is callback, previous way before promises
-    if (err){
-      console.error(err);
-      return res.status(500).send(err);
-    }
-    res.json({fileName: file.name, filePath: `/uploaded_files/${file.name}` })
-  })
-});
- */
 
+try{
+  mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true})
+  console.log("Established database connection!");
+}
+catch{
+  console.log("Error: could not connect to database, restart server");
+}
+
+//req, res properties see express documentation
 app.post('/upload', (req, res) => {
   if(req.files === null){
     return res.status(400).json({msg:'no file uploaded'});
@@ -55,48 +47,30 @@ app.post('/upload', (req, res) => {
   let file = req.files.file
   if(file.name.toLowerCase().includes("pdf")){
     pdf(file).then(function(data) {
-      // number of pages
-      ///console.log(data.numpages);
-      // PDF text
-      //console.log(data.text);
-      let x = data.text;
-      //console.log(x);
-      res.status(200).json(x);
-      //console.log("dude");
+      res.status(200).json(data.text); //documentation see pdf parse package
     }).catch(err=>{
-      console.log(err);
       res.status(500).json(err);
     });
   }
   else{
-    console.log("could not process");
     res.status(400).json("Could not handle anything else than pdf file");
   }
 });
 
-let socket;
-
 app.post('/newQuote', (req, res) => {
   console.log("in here");
   try {
-    mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
       let quote = new Quote();
       quote.quoteText = req.body.quoteText
       quote.quoteOffSet = req.body.quoteOffset
       quote.codeRefs = req.body.codeRefs
       quote.documentNum = req.body.documentNum
-      return quote
-    }).then(quote => {
+
       quote.save().then((data) => {
         res.status(200).json(data);
-        console.log("Data: ", data);
       }).catch( err => {
         res.status(400).json("Error: " + err);
-        mongoose.disconnect();
       })
-    }).catch(err =>{
-      mongoose.disconnect();
-    })
   }
   catch (err) {
     console.log(err);
@@ -104,9 +78,7 @@ app.post('/newQuote', (req, res) => {
 })
 
 app.delete('/deleteQuote', (req, res) =>{
-  console.log("in here");
   try {
-    mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
     Quote.deleteOne(req.body.id, (err) =>{
       if (!err){
         res.status(200).json("Ok");
@@ -114,10 +86,6 @@ app.delete('/deleteQuote', (req, res) =>{
       else{
         res.status(503).json("Could not delete quote: ", err);
       }
-    })
-    }).catch(err =>{
-      res.status(500).json(err);
-      mongoose.disconnect();
     })
   }
   catch (err) {
@@ -128,23 +96,15 @@ app.delete('/deleteQuote', (req, res) =>{
 app.post('/newCode', (req, res) => {
   console.log("in code");
   try {
-    mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
       let code = new Code();
       code.codeName = req.body.codeName;
       code.color = randomColor();
-      return code
-    }).then(code => {
+
       code.save().then((code) => {
         res.status(200).json(code);
-        console.log("Data: ", code);
       }).catch( err => {
         res.status(400).json("Error: " + err);
-        mongoose.disconnect();
       })
-    }).catch(err =>{
-      console.log(err);
-      mongoose.disconnect();
-    })
   }
   catch (err) {
     console.log(err);
@@ -152,9 +112,7 @@ app.post('/newCode', (req, res) => {
 })
 
 app.delete('/deleteCode', (req, res) =>{
-  console.log("in delete code");
   try {
-    mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
       Code.deleteOne(req.body.id, (err) =>{
         if (!err){
           res.status(200).json("Ok");
@@ -163,10 +121,6 @@ app.delete('/deleteCode', (req, res) =>{
           res.status(503).json("Could not delete code: ", err);
         }
       })
-    }).catch(err =>{
-      res.status(500).json(err);
-      mongoose.disconnect();
-    })
   }
   catch (err) {
     console.log(err);
@@ -179,57 +133,35 @@ function saveQuotePromise(quote) {
     return Quote.find();
   }).then((result) => {
     console.log(result);
-    mongoose.disconnect();
   }).catch(err => {
     if (err) {
       console.log(err);
-      mongoose.disconnect();
     }
   })
 }
 
 //***********************GET REQUESTS************************
 app.get("/Codes", (req, res) => {
-  console.log("in get code");
   try {
-    mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
       Code.find().then(codes => {
-        console.log("THE CODES: ", codes);
         res.status(200).json(codes);
-        mongoose.disconnect()
       }).catch(err => {
         res.status(500).json(err);
-        console.log("was error");
-        mongoose.disconnect();
       });
-    }).catch(err=>{
-      console.log(err);
-    })
   } catch (err) {
     console.log(err);
-    mongoose.disconnect();
   }
 });
 
 app.get("/Quotes", (req, res) => {
-  console.log("in get quote");
   try {
-    mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true}).then(() => {
       Quote.find().then(quotes => {
-        console.log("THE Quotes: ", quotes);
         res.status(200).json(quotes);
-        mongoose.disconnect()
       }).catch(err => {
         res.status(500).json(err);
-        console.log("was error");
-        mongoose.disconnect();
       });
-    }).catch(err=>{
-      console.log(err);
-    })
   } catch (err) {
     console.log(err);
-    mongoose.disconnect();
   }
 });
 
@@ -294,4 +226,15 @@ io.on('connection', (socket) => {
   })
 });
 
-  server.listen(PORT, () => console.log(`Server has started on port ${PORT}`));
+server.listen(PORT, () => console.log(`Server has started on port ${PORT}`));
+
+process.on('SIGINT', () => {
+  console.log('Received SIGINT. Press Control-D to exit.');
+  mongoose.disconnect();
+  console.log("Disconnected from MongoDB");
+});
+process.on('exit', (code) => {
+  console.log(`About to exit with code: ${code}`);
+  mongoose.disconnect();
+  console.log("Disconnected from MongoDB");
+});

@@ -83,3 +83,21 @@ async function showCollections(){
     await mongoose.disconnect();
     await console.log("disconnected");
 }
+
+
+
+/*
+app.post('/upload', (req, res) => {
+  if(req.files === null){
+    return res.status(400).json({msg:'no file uploaded'});
+  }
+  const file = req.files.file;
+  file.mv(`C:/Users/Ruben/Desktop/uploaded_files/${file.name}`, err => { //this is callback, previous way before promises
+    if (err){
+      console.error(err);
+      return res.status(500).send(err);
+    }
+    res.json({fileName: file.name, filePath: `/uploaded_files/${file.name}` })
+  })
+});
+ */
