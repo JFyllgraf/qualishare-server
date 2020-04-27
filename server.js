@@ -95,7 +95,7 @@ app.delete('/deleteQuote', (req, res) =>{
 })
 
 app.post('/newCode', (req, res) => {
-  console.log("in code");
+  console.log("in new code");
   try {
       let code = new Code();
       code.codeName = req.body.codeName;
@@ -111,6 +111,8 @@ app.post('/newCode', (req, res) => {
     console.log(err);
   }
 })
+
+//modify code, when adding quotes
 
 app.delete('/deleteCode', (req, res) =>{
   try {
@@ -157,11 +159,26 @@ app.get("/Codes", (req, res) => {
 
 app.get("/Quotes", (req, res) => {
   try {
-      Quote.find().where('this.') .then(quotes => {
+      Quote.find().then(quotes => {
         res.status(200).json(quotes);
       }).catch(err => {
         res.status(500).json(err);
+        console.log(err);
       });
+  } catch (err) {
+    console.log("Catch: ", err);
+  }
+});
+app.get("/Quotes/by_Code_id", (req, res) => {
+  try {
+    console.log(req.query);
+    Quote.find({codeRefs: req.query._id}).then(quotes => {
+      console.log(quotes);
+      res.status(200).json(quotes);
+    }).catch(err => {
+      res.status(500).json(err);
+      console.log(err);
+    });
   } catch (err) {
     console.log(err);
   }

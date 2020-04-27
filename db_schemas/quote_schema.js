@@ -5,9 +5,10 @@ const summary_length = 5;
 let quote_schema = new mongoose.Schema({
     id: mongoose.Schema.Types.ObjectID,
     quoteText: String,
-    quoteOffSet: Number,
+    quoteOffset: Number,
     codeRefs: String,
-    documentNum: Number
+    documentNum: Number,
+    userName: String
 });
 quote_schema.methods.getSummary = function () {
     return this.quoteText.match(/([\w]*\s|[\w]*)/gm).splice(0, summary_length).toString()
