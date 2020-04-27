@@ -48,7 +48,7 @@ app.post('/upload', (req, res) => {
   if(file.name.toLowerCase().includes("pdf")){
     pdf(file).then(function(data) {
       res.status(200).json(data.text); //documentation see pdf parse package
-    }).catch(err => {
+    }).catch(err=>{
       res.status(500).json(err);
     });
   }
@@ -61,10 +61,10 @@ app.post('/newQuote', (req, res) => {
   console.log("in here");
   try {
       let quote = new Quote();
-      quote.quoteText = req.body.quoteText;
-      quote.quoteOffSet = req.body.quoteOffset;
-      quote.codeRefs = req.body.codeRefs;
-      quote.documentNum = req.body.documentNum;
+      quote.quoteText = req.body.quoteText
+      quote.quoteOffSet = req.body.quoteOffset
+      quote.codeRefs = req.body.codeRefs
+      quote.documentNum = req.body.documentNum
 
       quote.save().then((data) => {
         res.status(200).json(data);
@@ -99,6 +99,7 @@ app.post('/newCode', (req, res) => {
       let code = new Code();
       code.codeName = req.body.codeName;
       code.color = randomColor();
+
       code.save().then((code) => {
         res.status(200).json(code);
       }).catch( err => {
