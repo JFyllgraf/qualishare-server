@@ -23,7 +23,7 @@ app.use(router);
 app.use(fileUpload());
 app.use(express.json());
 
-//this is also important
+//this is also important, very important
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -79,12 +79,13 @@ app.post('/newQuote', (req, res) => {
 
 app.delete('/deleteQuote', (req, res) =>{
   try {
-    Quote.deleteOne(req.body.id, (err) =>{
+    Quote.deleteOne({_id: req.body._id}, (err) =>{
       if (!err){
         res.status(200).json("Ok");
       }
       else{
-        res.status(503).json("Could not delete quote: ", err);
+        res.status(503).json(err);
+        console.log(err);
       }
     })
   }
@@ -113,12 +114,13 @@ app.post('/newCode', (req, res) => {
 
 app.delete('/deleteCode', (req, res) =>{
   try {
-      Code.deleteOne(req.body.id, (err) =>{
+      Code.deleteOne({_id: req.body._id}, (err) =>{
         if (!err){
           res.status(200).json("Ok");
         }
         else{
-          res.status(503).json("Could not delete code: ", err);
+          res.status(503).json(err);
+          console.log(err);
         }
       })
   }
@@ -155,7 +157,7 @@ app.get("/Codes", (req, res) => {
 
 app.get("/Quotes", (req, res) => {
   try {
-      Quote.find().then(quotes => {
+      Quote.find().where('this.') .then(quotes => {
         res.status(200).json(quotes);
       }).catch(err => {
         res.status(500).json(err);

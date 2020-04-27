@@ -7,7 +7,7 @@ let code_schema = new mongoose.Schema({
     memo: Array, //should be changed to array of memo's
     link: mongoose.Schema.Types.Mixed, //should be changed to link object
     color: String,
-    quoteRefs: [mongoose.Schema.Types.Mixed],
+    quoteRefs: [String],
 });
 
 code_schema.methods.addQuote = function (quote) {

@@ -6,7 +6,7 @@ let quote_schema = new mongoose.Schema({
     id: mongoose.Schema.Types.ObjectID,
     quoteText: String,
     quoteOffSet: Number,
-    codeRefs: Number,
+    codeRefs: String,
     documentNum: Number
 });
 quote_schema.methods.getSummary = function () {
