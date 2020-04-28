@@ -61,11 +61,12 @@ app.post('/newQuote', (req, res) => {
   console.log("in here");
   try {
       let quote = new Quote();
-      quote.quoteText = req.body.quoteText
-      quote.quoteOffSet = req.body.quoteOffset
-      quote.codeRefs = req.body.codeRefs
-      quote.documentNum = req.body.documentNum
-
+      quote.quoteText = req.body.quoteText;
+      quote.quoteOffSet = req.body.quoteOffset;
+      quote.codeRefs = req.body.codeRefs;
+      quote.documentNum = req.body.documentNum;
+      quote.userName = req.body.userName;
+      console.log(req.body.userName);
       quote.save().then((data) => {
         res.status(200).json(data);
       }).catch( err => {
@@ -100,6 +101,7 @@ app.post('/newCode', (req, res) => {
       let code = new Code();
       code.codeName = req.body.codeName;
       code.color = randomColor();
+      code.userName = req.body.userName;
 
       code.save().then((code) => {
         res.status(200).json(code);
