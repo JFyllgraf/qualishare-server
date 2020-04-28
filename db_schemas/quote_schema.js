@@ -8,7 +8,8 @@ let quote_schema = new mongoose.Schema({
     quoteOffset: Number,
     codeRefs: String,
     documentNum: Number,
-    userName: String
+    userName: String,
+    memo: String,
 });
 quote_schema.methods.getSummary = function () {
     return this.quoteText.match(/([\w]*\s|[\w]*)/gm).splice(0, summary_length).toString()

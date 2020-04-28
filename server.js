@@ -66,6 +66,7 @@ app.post('/newQuote', (req, res) => {
       quote.codeRefs = req.body.codeRefs;
       quote.documentNum = req.body.documentNum;
       quote.userName = req.body.userName;
+      quote.memo = req.body.memo;
       console.log(req.body.userName);
       quote.save().then((data) => {
         res.status(200).json(data);
