@@ -1,4 +1,4 @@
-var mongoose = require('mongoose');
+let mongoose = require('mongoose');
 import Quote from './quote_schema';
 
 let code_schema = new mongoose.Schema({
@@ -24,7 +24,7 @@ code_schema.methods.removeQuote = function (quoteText) {
     }
 };
 
-const Code = mongoose.model("Quote", code_schema;
+const Code = mongoose.model("Quote", code_schema);
 
 module.exports = {
     code_schema: code_schema,
