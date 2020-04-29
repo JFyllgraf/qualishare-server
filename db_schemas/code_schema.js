@@ -1,14 +1,14 @@
 let mongoose = require('mongoose');
-import Quote from './quote_schema';
+let Quote = require('./quote_schema');
 
 let code_schema = new mongoose.Schema({
-    name: String,
-    id: Schema.Types.ObjectID,
+    codeName: String,
+    id: mongoose.Schema.Types.ObjectID,
     memo: Array, //should be changed to array of memo's
-    link: Schema.Types.Mixed, //should be changed to link object
+    link: mongoose.Schema.Types.Mixed, //should be changed to link object
     color: String,
-    quoteRefs: [Quote],
-
+    quoteRefs: [String],
+    userName: String,
 });
 
 code_schema.methods.addQuote = function (quote) {
@@ -24,7 +24,7 @@ code_schema.methods.removeQuote = function (quoteText) {
     }
 };
 
-const Code = mongoose.model("Quote", code_schema);
+const Code = mongoose.model("Code", code_schema);
 
 module.exports = {
     code_schema: code_schema,

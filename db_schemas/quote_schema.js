@@ -3,9 +3,13 @@ var mongoose = require('mongoose');
 const summary_length = 5;
 
 let quote_schema = new mongoose.Schema({
+    id: mongoose.Schema.Types.ObjectID,
     quoteText: String,
-    quoteOffSet: Number,
-    codeRefs: Number
+    quoteOffset: Number,
+    codeRefs: String,
+    documentNum: Number,
+    userName: String,
+    memo: String,
 });
 quote_schema.methods.getSummary = function () {
     return this.quoteText.match(/([\w]*\s|[\w]*)/gm).splice(0, summary_length).toString()
