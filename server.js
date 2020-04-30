@@ -65,6 +65,7 @@ app.post('/newQuote', (req, res) => {
       quote.quoteOffSet = req.body.quoteOffset
       quote.codeRefs = req.body.codeRefs
       quote.documentNum = req.body.documentNum
+      quote.userName = req.body.userName
 
       quote.save().then((data) => {
         res.status(200).json(data);
