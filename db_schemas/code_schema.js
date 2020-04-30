@@ -8,6 +8,7 @@ let code_schema = new mongoose.Schema({
     link: mongoose.Schema.Types.Mixed, //should be changed to link object
     color: String,
     quoteRefs: [String],
+    userName: String,
 });
 
 code_schema.methods.addQuote = function (quote) {
