@@ -99,7 +99,7 @@ app.delete('/deleteQuote', (req, res) =>{
 
 app.delete('/deleteQuotes/by_Code_id', (req, res)=>{
   try {
-    Quote.deleteMany({_codeRefs: req.body._id}, (err) =>{
+    Quote.deleteMany({codeRefs: req.body._id}, (err) =>{
       if (!err){
         res.status(200).json("Ok");
       }
