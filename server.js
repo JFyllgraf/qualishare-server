@@ -149,7 +149,7 @@ function saveQuotePromise(quote) {
 }
 
 //***********************GET REQUESTS************************
-app.get("Codes", (req, res) => {
+app.get("/Codes", (req, res) => {
   try {
       Code.find().then(codes => {
         res.status(200).json(codes);
