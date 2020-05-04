@@ -62,7 +62,8 @@ app.post('/newQuote', (req, res) => {
   try {
       let quote = new Quote();
       quote.quoteText = req.body.quoteText;
-      quote.quoteOffSet = req.body.quoteOffset;
+      quote.quoteOffset.start = req.body.quoteOffset.start;
+      quote.quoteOffset.end = req.body.quoteOffset.end;
       quote.codeRefs = req.body.codeRefs;
       quote.documentNum = req.body.documentNum;
       quote.userName = req.body.userName;
