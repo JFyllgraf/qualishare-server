@@ -95,7 +95,24 @@ app.delete('/deleteQuote', (req, res) =>{
   catch (err) {
     console.log(err);
   }
-})
+});
+
+app.delete('/deleteQuotes/by_Code_id', (req, res)=>{
+  try {
+    Quote.deleteMany({_codeRefs: req.body._id}, (err) =>{
+      if (!err){
+        res.status(200).json("Ok");
+      }
+      else{
+        res.status(503).json(err);
+        console.log(err);
+      }
+    })
+  }
+  catch (err) {
+      console.log(err);
+    }
+});
 
 app.post('/newCode', (req, res) => {
   console.log("in new code");
@@ -134,6 +151,7 @@ app.delete('/deleteCode', (req, res) =>{
     console.log(err);
   }
 })
+
 
 function saveQuotePromise(quote) {
   quote.save().then((saveResult) => {
