@@ -248,11 +248,6 @@ io.on('connection', (socket) => {
   })
 });
 
-const funcsToTest = {};
-funcsToTest.add = (num1, num2) => num1 + num2;
-funcsToTest.multiply = (num1, num2) => num1 * num2;
-
-module.exports = funcsToTest;
 
 
 server.listen(PORT, () => console.log(`Server has started on port ${PORT}`));
