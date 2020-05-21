@@ -62,7 +62,8 @@ app.post('/newQuote', (req, res) => {
   try {
       let quote = new Quote();
       quote.quoteText = req.body.quoteText;
-      quote.quoteOffset = req.body.quoteOffset;
+      quote.quoteOffset.start = req.body.quoteOffset.start;
+      quote.quoteOffset.end = req.body.quoteOffset.end;
       quote.codeRefs = req.body.codeRefs;
       quote.documentNum = req.body.documentNum;
       quote.userName = req.body.userName;
@@ -94,7 +95,24 @@ app.delete('/deleteQuote', (req, res) =>{
   catch (err) {
     console.log(err);
   }
-})
+});
+
+app.delete('/deleteQuotes/by_Code_id', (req, res)=>{
+  try {
+    Quote.deleteMany({codeRefs: req.body._id}, (err) =>{
+      if (!err){
+        res.status(200).json("Ok");
+      }
+      else{
+        res.status(503).json(err);
+        console.log(err);
+      }
+    })
+  }
+  catch (err) {
+      console.log(err);
+    }
+});
 
 app.post('/newCode', (req, res) => {
   console.log("in new code");
@@ -133,6 +151,7 @@ app.delete('/deleteCode', (req, res) =>{
     console.log(err);
   }
 })
+
 
 function saveQuotePromise(quote) {
   quote.save().then((saveResult) => {
@@ -222,7 +241,7 @@ io.on('connection', (socket) => {
 
     socket.join(user.room);
 
-    socket.emit('message', { user: 'admin', text: `${user.name}, welcome to room ${user.room}.`});
+    socket.emit('message', { user: 'admin', text: `${user.name}, welcome!`});
     socket.broadcast.to(user.room).emit('message', { user: 'admin', text: `${user.name} has joined!` });
 
     io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room)});
@@ -247,7 +266,6 @@ io.on('connection', (socket) => {
     }
   })
 });
-
 
 server.listen(PORT, () => console.log(`Server has started on port ${PORT}`));
 
