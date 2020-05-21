@@ -62,7 +62,7 @@ app.post('/newQuote', (req, res) => {
   try {
       let quote = new Quote();
       quote.quoteText = req.body.quoteText;
-      quote.quoteOffSet = req.body.quoteOffset;
+      quote.quoteOffset = req.body.quoteOffset;
       quote.codeRefs = req.body.codeRefs;
       quote.documentNum = req.body.documentNum;
       quote.userName = req.body.userName;
@@ -77,7 +77,7 @@ app.post('/newQuote', (req, res) => {
   catch (err) {
     console.log(err);
   }
-})
+});
 
 app.delete('/deleteQuote', (req, res) =>{
   try {
@@ -247,7 +247,6 @@ io.on('connection', (socket) => {
     }
   })
 });
-
 
 
 server.listen(PORT, () => console.log(`Server has started on port ${PORT}`));

@@ -5,7 +5,10 @@ const summary_length = 5;
 let quote_schema = new mongoose.Schema({
     id: mongoose.Schema.Types.ObjectID,
     quoteText: String,
-    quoteOffset: Number,
+    quoteOffset: {
+        start: Number,
+        end: Number,
+    },
     codeRefs: String,
     documentNum: Number,
     userName: String,
