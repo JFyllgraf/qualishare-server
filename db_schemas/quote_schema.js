@@ -6,8 +6,8 @@ let quote_schema = new mongoose.Schema({
     id: mongoose.Schema.Types.ObjectID,
     quoteText: String,
     quoteOffset: {
-      start: Number,
-      end: Number
+        start: Number,
+        end: Number,
     },
     codeRefs: String,
     documentNum: Number,
@@ -57,4 +57,3 @@ fluffy.save(function (err) {
         console.log(err);
     }
 });
-*/
