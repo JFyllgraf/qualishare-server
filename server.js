@@ -212,7 +212,7 @@ io.on('connection', (socket) => {
   });
   socket.on("deleteQuote", data =>{
     console.log("server IO: delete quote" + data)
-    socket.broadcast.emit("deleteCode", data);
+    socket.broadcast.emit("deleteQuote", data);
   })
 
   // CHAT SOCKETS
