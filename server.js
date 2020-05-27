@@ -44,7 +44,7 @@ app.post('/upload', (req, res) => {
   if(req.files === null){
     return res.status(400).json({msg:'no file uploaded'});
   }
-  let file = req.files.file
+  let file = req.files.file;
   if(file.name.toLowerCase().includes("pdf")){
     pdf(file).then(function(data) {
       res.status(200).json(data.text); //documentation see pdf parse package
@@ -229,9 +229,9 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('newQuote', data);
   });
   socket.on("deleteQuote", data =>{
-    console.log("server IO: delete quote" + data)
-    socket.broadcast.emit("deleteCode", data);
-  })
+    console.log("server IO: delete quote" + data);
+    socket.broadcast.emit("deleteQuote", data);
+  });
 
   // CHAT SOCKETS
   socket.on('join', ({ name, room }, callback) => {
